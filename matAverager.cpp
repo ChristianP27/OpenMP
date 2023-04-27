@@ -151,19 +151,19 @@ int main( int argc, char* argv[] )
 		getDataFromFile( data,  argv[1], rows, cols );
 	}
 
-/*	//UNCOMMENT if you want to print the data array	
- *	cerr << "data: " << endl;
- *   	for( unsigned int i = 0; i < rows; i++ )
- *	{
- *		for( unsigned int j = 0; j < cols; j++ )
- *		{
- *			cerr << "i,j,data " << i << ", " << j << ", ";
- *			cerr << data[i][j] << " ";
- *		}
- *		cerr << endl;
- *	}
- *	cerr<< endl;
-*/
+	//UNCOMMENT if you want to print the data array	
+ 	// cerr << "data: " << endl;
+    // 	for( unsigned int i = 0; i < rows; i++ )
+ 	// {
+ 	// 	for( unsigned int j = 0; j < cols; j++ )
+ 	// 	{
+ 	// 		cerr << "i,j,data " << i << ", " << j << ", ";
+ 	// 		cerr << data[i][j] << " \t";
+ 	// 	}
+ 	// 	cerr << endl;
+ 	// }
+ 	// cerr<< endl;
+
 	// tell omp how many threads to use
 	omp_set_num_threads( numThreads );
 	
@@ -178,13 +178,45 @@ int main( int argc, char* argv[] )
 
 	float max = 0;
 	int maxi, maxj;
+	int sum;
 	
 #pragma omp parallel for
-	for (int i = 1; i < rows -1; i++ ){
+	for (int i = 0; i < rows; i++ ){
 		for ( int j = 1; j < cols -1 ; j++ ){
-				int sum = data[i-1][j-1] + data[i-1][j] + data[i-1][j+1]
-						+ data[i][j-1] + data[i][j] + data[i][j+1]
-						+ data[i+1][j-1] + data[i+1][j] + data[i+1][j+1];
+			if ( data[i][j] != NULL){
+				sum = data[i][j];
+			} 
+			
+			if ( data[i - 1][j - 1] != NULL) {
+				sum = sum +  data[i - 1][j - 1];
+			} 
+
+			if (  data[i-1][j] != NULL ){
+				sum = sum +  data[i-1][j];
+			}
+
+			if ( data[i][j-1] != NULL ){
+				sum = sum + data[i][j-1];
+			}
+
+			if ( data[i][j+1] != NULL ) {
+				sum = sum + data[i][j+1];
+			}
+
+			if ( data[i+1][j-1] != NULL ){
+				sum = sum + data[i+1][j-1];
+			}
+
+			if ( data[i+1][j] != NULL ){
+				sum = sum + data[i+1][j];
+			}
+
+			if ( data[i+1][j+1] != NULL ){
+				sum = sum + data[i+1][j+1];
+			}
+				// int sum = data[i-1][j-1] + data[i-1][j] + data[i-1][j+1]
+				// 		+ data[i][j-1] + data[i][j] + data[i][j+1]
+				// 		+ data[i+1][j-1] + data[i+1][j] + data[i+1][j+1];
 
 				float avg = sum / 9.0;
 				if ( avg > max ) {
