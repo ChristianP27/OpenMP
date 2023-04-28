@@ -178,7 +178,8 @@ int main( int argc, char* argv[] )
 	/////////////////////////////////////////////////////////////////////
 	float max = 0;
 	int imax, jmax;
-#pragma omp parallel for
+	int chunk_size = rows * cols / numThreads;
+#pragma omp parallel for reduction(max : max)
 for(int i = 0; i < rows; i++) {
     for(int j = 0; j < cols; j++) {
         int sum = 0;
@@ -188,6 +189,7 @@ for(int i = 0; i < rows; i++) {
                 if(k >= 0 && k < rows && l >= 0 && l < cols) {
                     sum += data[k][l];
                     count++;
+				
                 }
             }
         }

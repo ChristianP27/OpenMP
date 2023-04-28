@@ -1,3 +1,11 @@
 Christian Perry
 800657821
 chriper@siue.edu
+
+On VS code: rand 4 10000 10000 0
+
+row, col, avg: 4749, 2856, 9242.33
+elapsed time: 0.822596
+
+
+on the server when I add the schedule and the reduction atributes, i get 6 seconds over the 15 
