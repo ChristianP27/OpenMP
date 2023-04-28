@@ -2,7 +2,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
-#include <omp.h> // uses the open mp
+#include <omp.h>
 #include <sstream>
 #include <string>
 
@@ -152,17 +152,17 @@ int main( int argc, char* argv[] )
 	}
 
 	//UNCOMMENT if you want to print the data array	
- 	// cerr << "data: " << endl;
-    // 	for( unsigned int i = 0; i < rows; i++ )
- 	// {
- 	// 	for( unsigned int j = 0; j < cols; j++ )
- 	// 	{
- 	// 		cerr << "i,j,data " << i << ", " << j << ", ";
- 	// 		cerr << data[i][j] << " \t";
- 	// 	}
- 	// 	cerr << endl;
- 	// }
- 	// cerr<< endl;
+	// cerr << "data: " << endl;
+   	// for( unsigned int i = 0; i < rows; i++ )
+	// {
+	// 	for( unsigned int j = 0; j < cols; j++ )
+	// 	{
+	// 		cerr << "i,j,data " << i << ", " << j << ", ";
+	// 		cerr << data[i][j] << " \t ";
+	// 	}
+	// 	cerr << endl;
+	// }
+	// cerr<< endl;
 
 	// tell omp how many threads to use
 	omp_set_num_threads( numThreads );
@@ -170,80 +170,45 @@ int main( int argc, char* argv[] )
 	
 	stopwatch S1;
 	S1.start();
+	
 
 	/////////////////////////////////////////////////////////////////////
 	///////////////////////  YOUR CODE HERE       ///////////////////////
 	///////////////         Make it parallel!	 ////////////////////
 	/////////////////////////////////////////////////////////////////////
-
 	float max = 0;
-	int maxi, maxj;
-	int sum;
-	
+	int imax, jmax;
 #pragma omp parallel for
-	for (int i = 0; i < rows; i++ ){
-		for ( int j = 1; j < cols -1 ; j++ ){
-			if ( data[i][j] != NULL){
-				sum = data[i][j];
-			} 
-			
-			if ( data[i - 1][j - 1] != NULL) {
-				sum = sum +  data[i - 1][j - 1];
-			} 
-
-			if (  data[i-1][j] != NULL ){
-				sum = sum +  data[i-1][j];
-			}
-
-			if ( data[i][j-1] != NULL ){
-				sum = sum + data[i][j-1];
-			}
-
-			if ( data[i][j+1] != NULL ) {
-				sum = sum + data[i][j+1];
-			}
-
-			if ( data[i+1][j-1] != NULL ){
-				sum = sum + data[i+1][j-1];
-			}
-
-			if ( data[i+1][j] != NULL ){
-				sum = sum + data[i+1][j];
-			}
-
-			if ( data[i+1][j+1] != NULL ){
-				sum = sum + data[i+1][j+1];
-			}
-				// int sum = data[i-1][j-1] + data[i-1][j] + data[i-1][j+1]
-				// 		+ data[i][j-1] + data[i][j] + data[i][j+1]
-				// 		+ data[i+1][j-1] + data[i+1][j] + data[i+1][j+1];
-
-				float avg = sum / 9.0;
-				if ( avg > max ) {
-#pragma omp critical // no race conditions 
-					{
-					if (avg > max){
-						max = avg;
-						maxi = i;
-						maxj = j;
-					}
-				}
-			}
-		}
-	}
-
-// include the -fopenmp
-// check the edge casses
- // !./a.out rand 12 100 100 0
- // !./a.out [rand] [number of threads] [num rows] [number cols] [seed]
-
+for(int i = 0; i < rows; i++) {
+    for(int j = 0; j < cols; j++) {
+        int sum = 0;
+        int count = 0;
+        for(int k = i-1; k <= i+1; k++) {
+            for(int l = j-1; l <= j+1; l++) {
+                if(k >= 0 && k < rows && l >= 0 && l < cols) {
+                    sum += data[k][l];
+                    count++;
+                }
+            }
+        }
+        float avg = (float)sum / count;
+        if(avg > max) {
+            #pragma omp critical
+            {
+                if(avg > max) {
+                    max = avg;
+                    imax = i;
+                    jmax = j;
+                }
+            }
+        }
+    }
+}	
 	
 	S1.stop();
 	
 	// print out the max value here
-	
-	cerr << "i, j, avg: " << maxi << ", " << maxj << ", " << max << endl;
+	cerr << "row, col, avg: " << imax << ", " << jmax <<", " << max << endl;
 	cerr << "elapsed time: " << S1.getTime( ) << endl;
 }
-
 
